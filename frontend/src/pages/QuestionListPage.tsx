@@ -116,7 +116,7 @@ export function QuestionListPage() {
         {questions.map((item) => <QuestionCard key={item.id} question={item} onDelete={setPendingDelete} />)}
       </div>
       {pendingDelete && (
-        <ConfirmDialog title="删除题目" message={`确认删除「${pendingDelete.title}」？`} onCancel={() => setPendingDelete(null)} onConfirm={confirmDelete} />
+        <ConfirmDialog title="删除题目" message="确认删除这道题目？" onCancel={() => setPendingDelete(null)} onConfirm={confirmDelete} />
       )}
     </main>
   )

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class TagBase(BaseModel):
@@ -20,7 +20,6 @@ class TagRead(TagBase):
 
 
 class QuestionBase(BaseModel):
-    title: str = Field(min_length=1, max_length=255)
     question: str = Field(min_length=1)
     answer: str | None = ""
     note: str | None = ""
@@ -38,7 +37,6 @@ class QuestionUpdate(QuestionBase):
 
 class QuestionRead(BaseModel):
     id: int
-    title: str
     question: str
     answer: str | None
     note: str | None
@@ -48,3 +46,26 @@ class QuestionRead(BaseModel):
     tags: list[TagRead] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class BulkQuestionItem(BaseModel):
+    question: str = Field(
+        min_length=1,
+        validation_alias=AliasChoices("question", "题目"),
+    )
+    answer: str | None = Field(default="", validation_alias=AliasChoices("answer", "答案"))
+    note: str | None = Field(default="", validation_alias=AliasChoices("note", "笔记"))
+    source: str | None = Field(default="批量导入", validation_alias=AliasChoices("source", "来源"))
+    tags: list[str] = Field(default=[], validation_alias=AliasChoices("tags", "标签"))
+
+    model_config = ConfigDict(populate_by_name=True)
+
+
+class BulkQuestionCreate(BaseModel):
+    items: list[BulkQuestionItem] = Field(min_length=1)
+
+
+class BulkQuestionResult(BaseModel):
+    created_count: int
+    created_tag_count: int
+    questions: list[QuestionRead]

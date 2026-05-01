@@ -2,6 +2,7 @@ import { Link } from "react-router-dom"
 import { Edit3, Trash2 } from "lucide-react"
 import type { Question } from "../types/question"
 import { AnswerToggle } from "./AnswerToggle"
+import { MarkdownContent } from "./MarkdownContent"
 import { TagBadge } from "./TagBadge"
 import { getQuestionStatus, statusMeta } from "../utils/questionStatus"
 
@@ -13,13 +14,14 @@ interface Props {
 
 export function QuestionCard({ question, onDelete, compact }: Props) {
   const status = statusMeta[getQuestionStatus(question)]
+  const previewTitle = question.question.split("\n")[0] || "未填写问题"
 
   return (
     <article className={compact ? "question-card compact-card" : "question-card"}>
       <div className="card-head">
         <div>
           <div className="title-row">
-            <h3>{question.title}</h3>
+            <h3>{previewTitle}</h3>
             <span className={`status-pill ${status.className}`}>{status.label}</span>
           </div>
           <p className="muted">更新于 {new Date(question.updated_at).toLocaleString()}</p>
@@ -30,7 +32,11 @@ export function QuestionCard({ question, onDelete, compact }: Props) {
           <button className="icon-btn danger-icon" onClick={() => onDelete(question)} title="删除"><Trash2 size={16} /></button>
         </div>
       </div>
-      <p className="question-text">{question.question}</p>
+      {!compact && (
+        <div className="question-text">
+          <MarkdownContent>{question.question}</MarkdownContent>
+        </div>
+      )}
       <div className="tag-row">
         {question.tags.map((tag) => <TagBadge key={tag.id} tag={tag} />)}
       </div>

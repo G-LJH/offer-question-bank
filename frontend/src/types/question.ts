@@ -2,7 +2,6 @@ import type { Tag } from "./tag"
 
 export interface Question {
   id: number
-  title: string
   question: string
   answer: string | null
   note: string | null
@@ -13,10 +12,23 @@ export interface Question {
 }
 
 export interface QuestionPayload {
-  title: string
   question: string
   answer: string
   note: string
   source: string
   tag_ids: number[]
+}
+
+export interface BulkQuestionItem {
+  question: string
+  answer?: string
+  note?: string
+  source?: string
+  tags?: string[]
+}
+
+export interface BulkQuestionResult {
+  created_count: number
+  created_tag_count: number
+  questions: Question[]
 }

@@ -34,6 +34,16 @@ def create_question(payload: schemas.QuestionCreate, db: Session = Depends(get_d
     return crud.create_question(db, payload)
 
 
+@router.post("/bulk", response_model=schemas.BulkQuestionResult, status_code=status.HTTP_201_CREATED)
+def create_questions_bulk(payload: schemas.BulkQuestionCreate, db: Session = Depends(get_db)):
+    questions, created_tag_count = crud.create_questions_bulk(db, payload.items)
+    return {
+        "created_count": len(questions),
+        "created_tag_count": created_tag_count,
+        "questions": questions,
+    }
+
+
 @router.put("/{question_id}", response_model=schemas.QuestionRead)
 def update_question(question_id: int, payload: schemas.QuestionUpdate, db: Session = Depends(get_db)):
     question = crud.get_question(db, question_id)

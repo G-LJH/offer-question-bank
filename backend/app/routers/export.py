@@ -21,7 +21,7 @@ def export_questions(tag_ids: list[int] = Depends(parse_tag_ids), db: Session = 
         tag_text = " / ".join(tag.name for tag in item.tags) or "无"
         lines.extend(
             [
-                f"## {item.title}\n",
+                f"## 题目 {item.id}\n",
                 f"标签：{tag_text}\n",
                 _section("问题", item.question),
                 _section("答案", item.answer),

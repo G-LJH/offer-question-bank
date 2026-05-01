@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 import { AppLayout } from "./components/AppLayout"
 import { QuestionCreatePage } from "./pages/QuestionCreatePage"
+import { QuestionBulkCreatePage } from "./pages/QuestionBulkCreatePage"
 import { QuestionDetailPage } from "./pages/QuestionDetailPage"
 import { QuestionEditPage } from "./pages/QuestionEditPage"
 import { QuestionListPage } from "./pages/QuestionListPage"
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<QuestionListPage />} />
           <Route path="/review" element={<ReviewDashboardPage />} />
           <Route path="/questions/new" element={<QuestionCreatePage />} />
+          <Route path="/questions/bulk" element={<QuestionBulkCreatePage />} />
           <Route path="/questions/:id" element={<QuestionDetailPage />} />
           <Route path="/questions/:id/edit" element={<QuestionEditPage />} />
           <Route path="/settings/tags" element={<TagSettingsPage />} />

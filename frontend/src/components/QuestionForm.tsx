@@ -13,7 +13,6 @@ interface Props {
 }
 
 export function QuestionForm({ initialValue, tags, onSubmit }: Props) {
-  const [title, setTitle] = useState(initialValue?.title ?? "")
   const [question, setQuestion] = useState(initialValue?.question ?? "")
   const [answer, setAnswer] = useState(initialValue?.answer ?? "")
   const [note, setNote] = useState(initialValue?.note ?? "")
@@ -24,16 +23,15 @@ export function QuestionForm({ initialValue, tags, onSubmit }: Props) {
   async function submit(event: FormEvent) {
     event.preventDefault()
     setSaving(true)
-    await onSubmit({ title, question, answer, note, source, tag_ids: tagIds })
+    await onSubmit({ question, answer, note, source, tag_ids: tagIds })
     setSaving(false)
   }
 
   return (
     <form className="form" onSubmit={submit}>
-      <label>标题<input required value={title} onChange={(event) => setTitle(event.target.value)} /></label>
-      <label>问题<textarea required rows={6} value={question} onChange={(event) => setQuestion(event.target.value)} /></label>
-      <label>答案<textarea rows={7} value={answer} onChange={(event) => setAnswer(event.target.value)} /></label>
-      <label>笔记<textarea rows={4} value={note} onChange={(event) => setNote(event.target.value)} /></label>
+      <label>问题<textarea required rows={6} value={question} placeholder="支持 Markdown，例如：## 标题、- 列表、```代码```" onChange={(event) => setQuestion(event.target.value)} /></label>
+      <label>答案<textarea rows={7} value={answer} placeholder="支持 Markdown，可以写步骤、表格、代码块" onChange={(event) => setAnswer(event.target.value)} /></label>
+      <label>笔记<textarea rows={4} value={note} placeholder="支持 Markdown，例如复盘重点、易错点、参考链接" onChange={(event) => setNote(event.target.value)} /></label>
       <label>来源<input value={source} onChange={(event) => setSource(event.target.value)} /></label>
       <div>
         <p className="field-title">标签</p>

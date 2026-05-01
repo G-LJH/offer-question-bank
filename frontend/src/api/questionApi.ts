@@ -1,5 +1,5 @@
 import { http } from "./http"
-import type { Question, QuestionPayload } from "../types/question"
+import type { BulkQuestionItem, BulkQuestionResult, Question, QuestionPayload } from "../types/question"
 
 function params(tagIds?: number[]) {
   return tagIds?.length ? { tag_ids: tagIds.join(",") } : undefined
@@ -17,6 +17,11 @@ export async function getQuestionById(id: number) {
 
 export async function createQuestion(payload: QuestionPayload) {
   const { data } = await http.post<Question>("/api/questions", payload)
+  return data
+}
+
+export async function createQuestionsBulk(items: BulkQuestionItem[]) {
+  const { data } = await http.post<BulkQuestionResult>("/api/questions/bulk", { items })
   return data
 }
 

@@ -36,6 +36,11 @@ def _load_tags(db: Session, tag_ids: list[int]) -> list[models.Tag]:
     return list(db.scalars(select(models.Tag).where(models.Tag.id.in_(unique_ids))))
 
 
+def _question_title(question_text: str) -> str:
+    first_line = question_text.strip().splitlines()[0]
+    return first_line[:80] or "未命名题目"
+
+
 def list_questions(db: Session, tag_ids: list[int] | None = None) -> list[models.Question]:
     stmt = select(models.Question).options(selectinload(models.Question.tags))
     if tag_ids:
@@ -60,9 +65,10 @@ def get_question(db: Session, question_id: int) -> models.Question | None:
 
 
 def create_question(db: Session, payload: schemas.QuestionCreate) -> models.Question:
+    question_text = payload.question.strip()
     question = models.Question(
-        title=payload.title.strip(),
-        question=payload.question.strip(),
+        title=_question_title(question_text),
+        question=question_text,
         answer=payload.answer,
         note=payload.note,
         source=payload.source,
@@ -74,9 +80,51 @@ def create_question(db: Session, payload: schemas.QuestionCreate) -> models.Ques
     return get_question(db, question.id) or question
 
 
+def create_questions_bulk(db: Session, items: list[schemas.BulkQuestionItem]) -> tuple[list[models.Question], int]:
+    existing_tags = {tag.name.lower(): tag for tag in db.scalars(select(models.Tag))}
+    created_tag_count = 0
+    questions: list[models.Question] = []
+
+    for item in items:
+        tags: list[models.Tag] = []
+        for raw_name in item.tags:
+            name = raw_name.strip()
+            if not name:
+                continue
+            key = name.lower()
+            tag = existing_tags.get(key)
+            if not tag:
+                tag = models.Tag(name=name, color="#2563eb")
+                db.add(tag)
+                db.flush()
+                existing_tags[key] = tag
+                created_tag_count += 1
+            tags.append(tag)
+
+        question_text = item.question.strip()
+        question = models.Question(
+            title=_question_title(question_text),
+            question=question_text,
+            answer=item.answer,
+            note=item.note,
+            source=item.source or "批量导入",
+            tags=list(dict.fromkeys(tags)),
+        )
+        db.add(question)
+        questions.append(question)
+
+    db.commit()
+    for question in questions:
+        db.refresh(question)
+
+    created_questions = [get_question(db, question.id) or question for question in questions]
+    return created_questions, created_tag_count
+
+
 def update_question(db: Session, question: models.Question, payload: schemas.QuestionUpdate) -> models.Question:
-    question.title = payload.title.strip()
-    question.question = payload.question.strip()
+    question_text = payload.question.strip()
+    question.title = _question_title(question_text)
+    question.question = question_text
     question.answer = payload.answer
     question.note = payload.note
     question.source = payload.source

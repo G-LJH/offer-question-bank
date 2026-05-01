@@ -1,4 +1,4 @@
-import { BookOpen, Download, LayoutDashboard, Plus, Settings, Tags } from "lucide-react"
+import { BookOpen, Download, Files, LayoutDashboard, Plus, Settings, Tags } from "lucide-react"
 import { NavLink, Outlet } from "react-router-dom"
 
 export function AppLayout() {
@@ -16,6 +16,7 @@ export function AppLayout() {
           <NavLink to="/review"><LayoutDashboard size={18} />复习面板</NavLink>
           <NavLink to="/" end><BookOpen size={18} />题目库</NavLink>
           <NavLink to="/questions/new"><Plus size={18} />新增题目</NavLink>
+          <NavLink to="/questions/bulk"><Files size={18} />批量导入</NavLink>
           <NavLink to="/settings/tags"><Tags size={18} />标签配置</NavLink>
           <NavLink to="/export"><Download size={18} />导出中心</NavLink>
         </nav>
