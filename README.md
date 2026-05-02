@@ -34,6 +34,10 @@ npm install
 npm run dev
 ```
 
+- 新增 Windows 一键启动脚本 `start-dev.ps1`，可同时启动 FastAPI 后端和 Vite 前端。
+- 新增双击启动入口 `start-dev.bat`，方便从资源管理器直接启动项目。
+- 更新本地启动说明，补充快捷启动方式和自动安装前端依赖的说明。
+
 访问：
 
 - 复习面板：http://localhost:5173/review
