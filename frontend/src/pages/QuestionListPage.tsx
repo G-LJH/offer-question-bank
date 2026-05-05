@@ -1,4 +1,4 @@
-import { BookOpenCheck, CircleAlert, Clock3, Download, Plus, Search, SlidersHorizontal, Tags, X } from "lucide-react"
+import { Download, Plus, Search, SlidersHorizontal, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { deleteQuestion, getQuestions } from "../api/questionApi"
@@ -9,7 +9,6 @@ import { QuestionCard } from "../components/QuestionCard"
 import { TagBadge } from "../components/TagBadge"
 import type { Question } from "../types/question"
 import type { Tag } from "../types/tag"
-import { getQuestionStatus } from "../utils/questionStatus"
 
 export function QuestionListPage() {
   const [questions, setQuestions] = useState<Question[]>([])
@@ -19,10 +18,6 @@ export function QuestionListPage() {
   const [loading, setLoading] = useState(true)
   const [pendingDelete, setPendingDelete] = useState<Question | null>(null)
 
-  async function loadTags() {
-    setTags(await getTags())
-  }
-
   async function loadQuestions(ids = selectedIds) {
     setLoading(true)
     setQuestions(await getQuestions(ids))
@@ -30,11 +25,25 @@ export function QuestionListPage() {
   }
 
   useEffect(() => {
-    loadTags()
+    let ignore = false
+    getTags().then((items) => {
+      if (!ignore) setTags(items)
+    })
+    return () => {
+      ignore = true
+    }
   }, [])
 
   useEffect(() => {
-    loadQuestions(selectedIds)
+    let ignore = false
+    getQuestions(selectedIds).then((items) => {
+      if (ignore) return
+      setQuestions(items)
+      setLoading(false)
+    })
+    return () => {
+      ignore = true
+    }
   }, [selectedIds])
 
   function toggleTag(id: number) {
@@ -47,15 +56,6 @@ export function QuestionListPage() {
   )
 
   const selectedTags = tags.filter((tag) => selectedIds.includes(tag.id))
-  const stats = useMemo(() => {
-    return questions.reduce(
-      (acc, question) => {
-        acc[getQuestionStatus(question)] += 1
-        return acc
-      },
-      { unmastered: 0, reviewing: 0, mastered: 0, unset: 0 },
-    )
-  }, [questions])
 
   async function confirmDelete() {
     if (!pendingDelete) return
@@ -77,13 +77,6 @@ export function QuestionListPage() {
           <Link className="primary-btn" to="/questions/new"><Plus size={16} />新增题目</Link>
         </div>
       </header>
-
-      <section className="metric-grid">
-        <div className="metric-card danger-metric"><CircleAlert size={20} /><strong>{stats.unmastered}</strong><span>未掌握</span></div>
-        <div className="metric-card warning-metric"><Clock3 size={20} /><strong>{stats.reviewing}</strong><span>复习中</span></div>
-        <div className="metric-card success-metric"><BookOpenCheck size={20} /><strong>{stats.mastered}</strong><span>已掌握</span></div>
-        <div className="metric-card neutral-metric"><Tags size={20} /><strong>{stats.unset}</strong><span>待标记</span></div>
-      </section>
 
       <section className="filter-dock">
         <div className="filter-summary">

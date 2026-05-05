@@ -22,7 +22,15 @@ export function TagSettingsPage() {
   }
 
   useEffect(() => {
-    load()
+    let ignore = false
+    Promise.all([getTags(), getQuestions()]).then(([nextTags, nextQuestions]) => {
+      if (ignore) return
+      setTags(nextTags)
+      setQuestions(nextQuestions)
+    })
+    return () => {
+      ignore = true
+    }
   }, [])
 
   const usage = useMemo(() => {

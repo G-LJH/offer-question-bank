@@ -38,6 +38,6 @@ Start-Process powershell -ArgumentList @(
 ) -WindowStyle Normal
 
 Start-Sleep -Seconds 3
-Start-Process "http://localhost:5173/review"
+Start-Process "http://localhost:5173"
 
 Write-Host "Done. Close the two server windows to stop the project."
